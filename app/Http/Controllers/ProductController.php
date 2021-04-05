@@ -7,9 +7,11 @@ use App\Models\ProductVariant;
 use App\Models\ProductVariantPrice;
 use App\Models\Variant;
 use Illuminate\Http\Request;
+//use Illuminate\Contracts\Support\Jsonable;
 
 class ProductController extends Controller
 {
+    
     /**
      * Display a listing of the resource.
      *
@@ -18,7 +20,8 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::paginate(4);
-        //dd($products);
+        //return $products;
+        //return $products;
         return view('products.index',compact('products'));
     }
 

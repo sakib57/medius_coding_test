@@ -11,7 +11,7 @@
         <form action="" method="get" class="card-header">
             <div class="form-row justify-content-between">
                 <div class="col-md-2">
-                    <input onkeyup="searchByTitle(this.value)" type="text" name="title" placeholder="Product Title" class="form-control">
+                    <input type="text" name="title" placeholder="Product Title" class="form-control">
                 </div>
                 <div class="col-md-2">
                     <select name="variant" id="" class="form-control">
@@ -94,7 +94,7 @@
         <div class="card-footer">
             <div class="row justify-content-between">
                 <div class="col-md-6">
-                    <p>Showing {{ $products->firstItem() }} to {{ $products->total() -  ($products->total() - $products->perPage()) }}  out of {{ $products->total() }}</p>
+                    <p>Showing {{$products->firstItem()}} to {{$products->lastItem()}}  out of {{ $products->total() }}</p>
                     {{-- {{ $products->total }} --}}
                 </div>
                 <div class="col-md-2">
@@ -103,42 +103,5 @@
             </div>
         </div>
     </div>
-
-    <script>
-        function searchByTitle(key){
-            alert(key);
-            // $('#myTable').html(
-            //     '<thead>'+'
-            //         <tr>'+'
-            //             <th>#</th>'+'
-            //             <th>Title</th>'+'
-            //             <th>Description</th>'+'
-            //             <th>Variant</th>'+'
-            //             <th width="150px">Action</th>'+'
-            //         </tr>'+'
-            //         </thead>'
-            // );
-            $.ajax({
-                url: 'search-product-title/'+key,
-                type: 'get',
-                success: function(data){
-                    $('#myTable').append(
-                        '<thead>'+'
-                    <tr>'+'
-                        <th>#</th>'+'
-                        <th>Title</th>'+'
-                        <th>Description</th>'+'
-                        <th>Variant</th>'+'
-                        <th width="150px">Action</th>'+'
-                    </tr>'+'
-                    </thead>'
-                    );
-                }
-                // This is the important part!
-                //data: {key:key}
-            })
-        }
-
-    </script>
 
 @endsection

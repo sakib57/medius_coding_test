@@ -8,14 +8,35 @@
 
 
     <div class="card">
-        <form action="" method="get" class="card-header">
+        <form action="{{ route('product.filter') }}" method="post" class="card-header">
+            @csrf
             <div class="form-row justify-content-between">
                 <div class="col-md-2">
                     <input type="text" name="title" placeholder="Product Title" class="form-control">
                 </div>
                 <div class="col-md-2">
                     <select name="variant" id="" class="form-control">
-
+                        <optgroup label="Color">
+                            @foreach($product_variant as $v)
+                            @if($v->variant_id == 1)
+                            <option value="">{{ $v->variant }}</option>
+                            @endif
+                            @endforeach
+                        </optgroup>
+                        <optgroup label="Size">
+                            @foreach($product_variant as $v)
+                            @if($v->variant_id ==2)
+                            <option value="">{{ $v->variant }}</option>
+                            @endif
+                            @endforeach
+                        </optgroup>
+                        <optgroup label="Style">
+                            @foreach($product_variant as $v)
+                            @if($v->variant_id ==6)
+                            <option value="">{{ $v->variant }}</option>
+                            @endif
+                            @endforeach
+                        </optgroup>
                     </select>
                 </div>
 

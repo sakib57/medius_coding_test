@@ -20,9 +20,10 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::paginate(4);
+        $productVariant = ProductVariant::distinct()->get(['variant','variant_id']);
         //return $products;
         //return $products;
-        return view('products.index',compact('products'));
+        return view('products.index',compact('products'))->with('product_variant',$productVariant);
     }
 
     /**
@@ -103,9 +104,25 @@ class ProductController extends Controller
     }
 
     ////// Custom methods
-    public function searchByTitle($key){
+    public function productFilter(Request $request){
+        dd($request);
+        $title = $request->title;
+        $variant = $request->variant;
+        $priceFrom = $request->price_from;
+        $priceTo = $request->price_to;
+        $date = $request->date;
+        if(!is_null($title) ){
+
+        }
+        //$products = Product::where()
+
+
+
+
+
+
         //$products = Product::with('variants')->paginate(4);
-        $products = Product::where('title', 'like', '%' . $key . '%')->get();
-        return $products;
+        //$products = Product::where('title', 'like', '%' . $key . '%')->get();
+        //return $products;
     }
 }

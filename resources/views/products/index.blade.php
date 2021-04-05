@@ -54,19 +54,23 @@
                 @foreach($products as $v)
                     <tr>
                         <td>{{ $v->id }}</td>
-                        <td>{{ $v->title }} <br> Created at : {{ date('d-M-Y', strtotime($v->created_at)) }}</td>
-                        <td width="250px"><span style="text-overflow: ellipsis;hite-space: nowrap;
-                            overflow: hidden;">{{ $v->description }}</span></td>
+                        <td width="150px">{{ $v->title }} <br> Created at : {{ date('d-M-Y', strtotime($v->created_at)) }}</td>
+                        <td width="250px">{{\Illuminate\Support\Str::limit($v->description, 200) }}</td>
                         <td>
-                            <dl class="row mb-0" style="height: 80px; overflow: hidden" id="variant">
+                            <dl class="row mb-0" style=" overflow: hidden" id="variant">
 
-                                <dt class="col-sm-3 pb-0">
-                                    SM/ Red/ V-Nick
+                                <dt class="col-sm-4 pb-0">
+                                    {{-- SM/ Red/ V-Nick --}}
+                                    @foreach($v->productVariantPrice as $r)
+                                        @if($r->productVariantOne) {{ $r->productVariantOne->variant }} @endif
+                                        @if($r->productVariantTwo) / {{ $r->productVariantTwo->variant }} @endif  
+                                        @if($r->productVariantThree) / {{ $r->productVariantThree->variant }}  @endif<br> 
+                                    @endforeach
                                 </dt>
-                                <dd class="col-sm-9">
+                                <dd class="col-sm-8">
                                     <dl class="row mb-0">
-                                        <dt class="col-sm-4 pb-0">Price : {{ $v->productVariantPrice->price }}</dt>
-                                        <dd class="col-sm-8 pb-0">InStock : {{ $v->productVariantPrice->stock }}</dd>
+                                        <dt class="col-sm-6 pb-0"> @foreach($v->productVariantPrice as $p) Price : {{ $p->price }}<br> @endforeach </dt>
+                                        <dd class="col-sm-6 pb-0"> @foreach($v->productVariantPrice as $p) InStock : {{ $p->stock }} <br> @endforeach</dd>
                                     </dl>
                                 </dd>
                             </dl>

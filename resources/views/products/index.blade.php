@@ -8,35 +8,66 @@
 
 
     <div class="card">
-        <form action="{{ route('product.filter') }}" method="post" class="card-header">
-            @csrf
+        <form action="{{ route('product.filter') }}" method="get" class="card-header">
+            
             <div class="form-row justify-content-between">
                 <div class="col-md-2">
-                    <input type="text" name="title" placeholder="Product Title" class="form-control">
+                    <input type="text" value="{{ request()->input('title') }}" name="title" placeholder="Product Title" class="form-control">
                 </div>
                 <div class="col-md-2">
-                    <select name="variant" id="" class="form-control">
-                        <optgroup label="Color">
-                            @foreach($product_variant as $v)
-                            @if($v->variant_id == 1)
-                            <option value="">{{ $v->variant }}</option>
+                    <input type="hidden" name="variant_name" id="variant_name"/>
+                    <select id="variant" onChange="set_variant_name()" name="variant" id="" class="form-control">
+                        @if(request()->input('variant_name'))
+                            <option value="{{ request()->input('variant') }}">{{ request()->input('variant_name') }}</option>
+                            @if(request()->input('variant_name') != 'All')
+                                <option value="">All</option>
                             @endif
-                            @endforeach
-                        </optgroup>
-                        <optgroup label="Size">
-                            @foreach($product_variant as $v)
-                            @if($v->variant_id ==2)
-                            <option value="">{{ $v->variant }}</option>
-                            @endif
-                            @endforeach
-                        </optgroup>
-                        <optgroup label="Style">
-                            @foreach($product_variant as $v)
-                            @if($v->variant_id ==6)
-                            <option value="">{{ $v->variant }}</option>
-                            @endif
-                            @endforeach
-                        </optgroup>
+                            <optgroup label="Color">
+                                @foreach($product_variant as $v)
+                                @if($v->variant_id == 1)
+                                <option value="{{ $v->id }}">{{ $v->variant }}</option>
+                                @endif
+                                @endforeach
+                            </optgroup>
+                            <optgroup label="Size">
+                                @foreach($product_variant as $v)
+                                @if($v->variant_id ==2)
+                                <option value="{{ $v->id }}">{{ $v->variant }}</option>
+                                @endif
+                                @endforeach
+                            </optgroup>
+                            <optgroup label="Style">
+                                @foreach($product_variant as $v)
+                                @if($v->variant_id ==6)
+                                <option value="{{ $v->id }}">{{ $v->variant }}</option>
+                                @endif
+                                @endforeach
+                            </optgroup>
+                        @else
+                            <option value="">All</option>
+                            <optgroup label="Color">
+                                @foreach($product_variant as $v)
+                                @if($v->variant_id == 1)
+                                <option value="{{ $v->id }}">{{ $v->variant }}</option>
+                                @endif
+                                @endforeach
+                            </optgroup>
+                            <optgroup label="Size">
+                                @foreach($product_variant as $v)
+                                @if($v->variant_id ==2)
+                                <option value="{{ $v->id }}">{{ $v->variant }}</option>
+                                @endif
+                                @endforeach
+                            </optgroup>
+                            <optgroup label="Style">
+                                @foreach($product_variant as $v)
+                                @if($v->variant_id ==6)
+                                <option value="{{ $v->id }}">{{ $v->variant }}</option>
+                                @endif
+                                @endforeach
+                            </optgroup>
+                        @endif
+                        
                     </select>
                 </div>
 
@@ -45,12 +76,12 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text">Price Range</span>
                         </div>
-                        <input type="text" name="price_from" aria-label="First name" placeholder="From" class="form-control">
-                        <input type="text" name="price_to" aria-label="Last name" placeholder="To" class="form-control">
+                        <input type="text" value="{{ request()->input('price_from') }}" name="price_from" aria-label="First name" placeholder="From" class="form-control">
+                        <input type="text" value="{{ request()->input('price_to') }}" name="price_to" aria-label="Last name" placeholder="To" class="form-control">
                     </div>
                 </div>
                 <div class="col-md-2">
-                    <input type="date" name="date" placeholder="Date" class="form-control">
+                    <input type="date" value="{{ request()->input('date') }}" name="date" placeholder="Date" class="form-control">
                 </div>
                 <div class="col-md-1">
                     <button type="submit" class="btn btn-primary float-right"><i class="fa fa-search"></i></button>
@@ -119,10 +150,19 @@
                     {{-- {{ $products->total }} --}}
                 </div>
                 <div class="col-md-2">
-                    {{ $products->links() }}
+                    {{-- {{ $products->links() }} --}}
+                    {{ $products->appends($_GET)->links() }}
                 </div>
             </div>
         </div>
     </div>
+
+    <script>
+        function set_variant_name(){
+            var e = document.getElementById("variant");
+            var val = e.options[e.selectedIndex].text;
+            document.getElementById("variant_name").value =val;
+        }
+    </script>
 
 @endsection

@@ -12,12 +12,12 @@ class ProductVariantPrice extends Model
     protected $guarded = [];
 
     public function productVariantOne(){
-        return $this->belongsTo(ProductVariant::class,'product_variant_one','id');
+        return $this->belongsTo(ProductVariant::class,'product_variant_one');
     }
     public function productVariantTwo(){
-        return $this->belongsTo(ProductVariant::class,'product_variant_two','id');
+        return $this->belongsTo(ProductVariant::class,'product_variant_two');
     }
     public function productVariantThree(){
-        return $this->belongsTo(ProductVariant::class,'product_variant_three','id');
+        return $this->belongsTo(ProductVariant::class,'product_variant_three');
     }
 }

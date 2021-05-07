@@ -7,6 +7,8 @@ use App\Models\ProductVariant;
 use App\Models\ProductVariantPrice;
 use App\Models\Variant;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Builder;
+use DB;
 //use Illuminate\Contracts\Support\Jsonable;
 
 class ProductController extends Controller
@@ -20,9 +22,7 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::paginate(4);
-        $productVariant = ProductVariant::distinct()->get(['variant','variant_id']);
-        //return $products;
-        //return $products;
+        $productVariant = ProductVariant::groupBy('variant')->get();
         return view('products.index',compact('products'))->with('product_variant',$productVariant);
     }
 
@@ -105,24 +105,69 @@ class ProductController extends Controller
 
     ////// Custom methods
     public function productFilter(Request $request){
-        dd($request);
+        //dd($request);
         $title = $request->title;
         $variant = $request->variant;
         $priceFrom = $request->price_from;
         $priceTo = $request->price_to;
         $date = $request->date;
-        if(!is_null($title) ){
 
+        if(
+            is_null($title) && is_null($variant) && 
+            is_null($priceFrom) && is_null($priceTo) &&
+            is_null($date)
+        ){
+            $products = Product::paginate(4);
+        }else{
+            $products_query = Product::query();
+
+            if(!is_null($title))
+            {
+                $products_query->where('products.title','LIKE',"%$title%");
+            }
+            
+            if(!is_null($variant)){
+                $products_query->with(['productVariantPrice' => function($query) use ($variant) {
+                    $query->where('product_variant_one', $variant)
+                    ->orWhere('product_variant_two',$variant)
+                    ->orWhere('product_variant_three',$variant);
+                }])->whereHas('productVariantPrice', function (Builder $query) use ($variant) {
+                    $query->where('product_variant_one', $variant)
+                    ->orWhere('product_variant_two',$variant)
+                    ->orWhere('product_variant_three',$variant);
+                });
+            }
+
+            if(!is_null($priceFrom) && !is_null($priceTo)){
+                $products_query->with(['productVariantPrice' => function($query) use ($priceFrom,$priceTo) {
+                    $query->whereBetween('price', [$priceFrom, $priceTo]);
+                }])->whereHas('productVariantPrice', function (Builder $query) use ($priceFrom,$priceTo) {
+                    $query->whereBetween('price', [$priceFrom, $priceTo]);
+                });
+            }else if(is_null($priceFrom) && !is_null($priceTo)){
+                $priceFrom = 0;
+                $products_query->with(['productVariantPrice' => function($query) use ($priceFrom,$priceTo) {
+                    $query->whereBetween('price', [$priceFrom, $priceTo]);
+                }])->whereHas('productVariantPrice', function (Builder $query) use ($priceFrom,$priceTo) {
+                    $query->whereBetween('price', [$priceFrom, $priceTo]);
+                });
+            }else if(!is_null($priceFrom) && is_null($priceTo)){
+                $priceTo = ProductVariantPrice::max('price');
+                $products_query->with(['productVariantPrice' => function($query) use ($priceFrom,$priceTo) {
+                    $query->whereBetween('price', [$priceFrom, $priceTo]);
+                }])->whereHas('productVariantPrice', function (Builder $query) use ($priceFrom,$priceTo) {
+                    $query->whereBetween('price', [$priceFrom, $priceTo]);
+                });
+            }
+
+            if(!is_null($date)){
+                // In products table type of 'created_at' changed from TIMESTAMP to DATE
+                $date = date($date);
+                $products_query->where('products.created_at',$date);
+            }
+            $products = $products_query->paginate(4);
         }
-        //$products = Product::where()
-
-
-
-
-
-
-        //$products = Product::with('variants')->paginate(4);
-        //$products = Product::where('title', 'like', '%' . $key . '%')->get();
-        //return $products;
+        $productVariant = ProductVariant::groupBy('variant')->get();
+        return view('products.index',compact('products'))->with('product_variant',$productVariant);
     }
 }

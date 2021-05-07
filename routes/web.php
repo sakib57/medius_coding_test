@@ -27,5 +27,5 @@ Route::middleware('auth')->group(function () {
     Route::resource('blog', 'BlogController');
     Route::resource('blog-category', 'BlogCategoryController');
 
-    Route::post('product-filter','ProductController@productFilter')->name('product.filter');
+    Route::get('product-filter','ProductController@productFilter')->name('product.filter');
 });

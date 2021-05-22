@@ -27,7 +27,7 @@ Vue.component('create-product', require('./components/CreateProduct.vue').defaul
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
- import ProductList from './components/ProductList.vue'
+
 const app = new Vue({
     el: '#app',
     

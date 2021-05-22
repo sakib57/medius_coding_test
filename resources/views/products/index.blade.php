@@ -114,9 +114,9 @@
                                 <dt class="col-sm-4 pb-0">
                                     {{-- SM/ Red/ V-Nick --}}
                                     @foreach($v->productVariantPrice as $r)
-                                        @if($r->productVariantOne) {{ $r->productVariantOne->variant }} @endif
-                                        @if($r->productVariantTwo) / {{ $r->productVariantTwo->variant }} @endif  
-                                        @if($r->productVariantThree) / {{ $r->productVariantThree->variant }}  @endif<br> 
+                                        @if($r->productVariantOne){{$r->productVariantOne->variant}}@endif
+                                        @if($r->productVariantTwo)/{{$r->productVariantTwo->variant}}@endif  
+                                        @if($r->productVariantThree)/{{$r->productVariantThree->variant}}@endif<br> 
                                     @endforeach
                                 </dt>
                                 <dd class="col-sm-8">

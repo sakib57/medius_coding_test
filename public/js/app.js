@@ -2012,6 +2012,96 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -2025,13 +2115,14 @@ __webpack_require__.r(__webpack_exports__);
       type: Array,
       required: true
     },
-    products: {}
+    products: {},
+    product_id: {}
   },
   data: function data() {
     return {
-      product_name: '',
-      product_sku: '',
-      description: '',
+      product_name: "",
+      product_sku: "",
+      description: "",
       images: [],
       product_variant: [{
         option: this.variants[0].id,
@@ -2039,14 +2130,39 @@ __webpack_require__.r(__webpack_exports__);
       }],
       product_variant_prices: [],
       dropzoneOptions: {
-        url: 'https://httpbin.org/post',
+        url: "http://127.0.0.1:8000/image-upload",
         thumbnailWidth: 150,
         maxFilesize: 0.5,
         headers: {
           "My-Awesome-Header": "header value"
-        }
+        },
+        addRemoveLinks: true //autoProcessQueue: false,
+        //uploadMultiple:true
+
       }
     };
+  },
+  created: function created() {
+    var _this = this;
+
+    if (this.product_id) {
+      console.log(this.product_id);
+      axios.get("/product-edit/".concat(this.product_id)).then(function (response) {
+        console.log(response.data);
+        _this.product_name = response.data.product.title;
+        _this.product_sku = response.data.product.sku;
+        _this.description = response.data.product.description; // response.data.product.product_variant.forEach(element => {
+        //     var self = this;
+        //     self.product_variant.tags.push(element.variant);
+        // });
+
+        _this.product_variant_prices = response.data.product.product_variant_price; // console.log(this.product_variant_pricesr);
+      })["catch"](function (error) {
+        console.log(error);
+      });
+    } else {
+      console.log("it is create page");
+    }
   },
   methods: {
     // it will push a new object into product variant
@@ -2073,7 +2189,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     // check the variant and render all the combination
     checkVariant: function checkVariant() {
-      var _this = this;
+      var _this2 = this;
 
       var tags = [];
       this.product_variant_prices = [];
@@ -2081,7 +2197,7 @@ __webpack_require__.r(__webpack_exports__);
         tags.push(item.tags);
       });
       this.getCombn(tags).forEach(function (item) {
-        _this.product_variant_prices.push({
+        _this2.product_variant_prices.push({
           title: item,
           price: 0,
           stock: 0
@@ -2090,7 +2206,9 @@ __webpack_require__.r(__webpack_exports__);
     },
     // combination algorithm
     getCombn: function getCombn(arr, pre) {
-      pre = pre || '';
+      console.log("executing: ");
+      console.log(arr);
+      pre = pre || "";
 
       if (!arr.length) {
         return pre;
@@ -2098,9 +2216,17 @@ __webpack_require__.r(__webpack_exports__);
 
       var self = this;
       var ans = arr[0].reduce(function (ans, value) {
-        return ans.concat(self.getCombn(arr.slice(1), pre + value + '/'));
+        return ans.concat(self.getCombn(arr.slice(1), pre + value + "/"));
       }, []);
       return ans;
+    },
+    // image processing
+    filesAdded: function filesAdded(files) {
+      //this.images.push(files);
+      console.log(this.images);
+    },
+    afterUploadSuccess: function afterUploadSuccess(file, response) {
+      this.images.push(response);
     },
     // store product into database
     saveProduct: function saveProduct() {
@@ -2112,16 +2238,36 @@ __webpack_require__.r(__webpack_exports__);
         product_variant: this.product_variant,
         product_variant_prices: this.product_variant_prices
       };
+      console.log(product);
       axios.post('/product', product).then(function (response) {
-        console.log(response.data);
+        if (response.data.status == 'created') {
+          window.location.href = '/product';
+        }
       })["catch"](function (error) {
         console.log(error);
       });
-      console.log(product);
+    },
+    updateProduct: function updateProduct() {
+      var product = {
+        id: this.product_id,
+        title: this.product_name,
+        sku: this.product_sku,
+        description: this.description,
+        //product_image: this.images,
+        //product_variant: this.product_variant,
+        product_variant_prices: this.product_variant_prices
+      };
+      axios.post("/product-update", product).then(function (response) {
+        if (response.data.status == "updated") {
+          window.location.href = "/product";
+        }
+      })["catch"](function (error) {
+        console.log(error);
+      });
     }
   },
   mounted: function mounted() {
-    console.log('Component mounted.');
+    console.log("Component mounted.");
   }
 });
 
@@ -50570,7 +50716,11 @@ var render = function() {
             [
               _c("vue-dropzone", {
                 ref: "myVueDropzone",
-                attrs: { id: "dropzone", options: _vm.dropzoneOptions }
+                attrs: { id: "dropzone", options: _vm.dropzoneOptions },
+                on: {
+                  "vdropzone-success": _vm.afterUploadSuccess,
+                  "vdropzone-files-added": _vm.filesAdded
+                }
               })
             ],
             1
@@ -50632,9 +50782,9 @@ var render = function() {
                           },
                           [
                             _vm._v(
-                              "\n                                        " +
+                              "\n                    " +
                                 _vm._s(variant.title) +
-                                "\n                                    "
+                                "\n                  "
                             )
                           ]
                         )
@@ -50695,7 +50845,7 @@ var render = function() {
                     staticClass: "btn btn-primary",
                     on: { click: _vm.newVariant }
                   },
-                  [_vm._v("Add another option")]
+                  [_vm._v("\n            Add another option\n          ")]
                 )
               ])
             : _vm._e(),
@@ -50713,7 +50863,40 @@ var render = function() {
                   "tbody",
                   _vm._l(_vm.product_variant_prices, function(variant_price) {
                     return _c("tr", [
-                      _c("td", [_vm._v(_vm._s(variant_price.title))]),
+                      (variant_price.product_variant_one != null) |
+                      (variant_price.product_variant_two != null) |
+                      (variant_price.product_variant_three != null)
+                        ? _c("td", [
+                            variant_price.product_variant_one != null
+                              ? _c("span", [
+                                  _vm._v(
+                                    _vm._s(
+                                      variant_price.product_variant_one.variant
+                                    ) + "/"
+                                  )
+                                ])
+                              : _vm._e(),
+                            variant_price.product_variant_two != null
+                              ? _c("span", [
+                                  _vm._v(
+                                    _vm._s(
+                                      variant_price.product_variant_two.variant
+                                    ) + "/"
+                                  )
+                                ])
+                              : _vm._e(),
+                            variant_price.product_variant_three != null
+                              ? _c("span", [
+                                  _vm._v(
+                                    _vm._s(
+                                      variant_price.product_variant_three
+                                        .variant
+                                    ) + "/"
+                                  )
+                                ])
+                              : _vm._e()
+                          ])
+                        : _c("td", [_vm._v(_vm._s(variant_price.title))]),
                       _vm._v(" "),
                       _c("td", [
                         _c("input", {
@@ -50781,15 +50964,25 @@ var render = function() {
       ])
     ]),
     _vm._v(" "),
-    _c(
-      "button",
-      {
-        staticClass: "btn btn-lg btn-primary",
-        attrs: { type: "submit" },
-        on: { click: _vm.saveProduct }
-      },
-      [_vm._v("Save")]
-    ),
+    this.product_id
+      ? _c(
+          "button",
+          {
+            staticClass: "btn btn-lg btn-primary",
+            attrs: { type: "submit" },
+            on: { click: _vm.updateProduct }
+          },
+          [_vm._v("\n    Update\n  ")]
+        )
+      : _c(
+          "button",
+          {
+            staticClass: "btn btn-lg btn-primary",
+            attrs: { type: "submit" },
+            on: { click: _vm.saveProduct }
+          },
+          [_vm._v("\n    Save\n  ")]
+        ),
     _vm._v(" "),
     _c(
       "button",
@@ -63063,12 +63256,9 @@ module.exports = function(module) {
 /*!*****************************!*\
   !*** ./resources/js/app.js ***!
   \*****************************/
-/*! no exports provided */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _components_ProductList_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./components/ProductList.vue */ "./resources/js/components/ProductList.vue");
 /**
  * First we will load all of this project's JavaScript dependencies which
  * includes Vue and other libraries. It is a great starting point when
@@ -63096,7 +63286,6 @@ Vue.component('create-product', __webpack_require__(/*! ./components/CreateProdu
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
-
 
 var app = new Vue({
   el: '#app'
@@ -63226,38 +63415,6 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/ProductList.vue":
-/*!*************************************************!*\
-  !*** ./resources/js/components/ProductList.vue ***!
-  \*************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
-var render, staticRenderFns
-var script = {}
-
-
-/* normalize component */
-
-var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_0__["default"])(
-  script,
-  render,
-  staticRenderFns,
-  false,
-  null,
-  null,
-  null
-  
-)
-
-component.options.__file = "resources/js/components/ProductList.vue"
-/* harmony default export */ __webpack_exports__["default"] = (component.exports);
-
-/***/ }),
-
 /***/ "./resources/js/sb-admin.js":
 /*!**********************************!*\
   !*** ./resources/js/sb-admin.js ***!
@@ -63344,8 +63501,8 @@ component.options.__file = "resources/js/components/ProductList.vue"
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! C:\Users\XTREEM\Desktop\interview-question-sr\interview-question-sr\resources\js\app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! C:\Users\XTREEM\Desktop\interview-question-sr\interview-question-sr\resources\sass\app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! C:\Users\XTREEM\Desktop\Desktop\interview-question-sr\interview-question-sr\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\Users\XTREEM\Desktop\Desktop\interview-question-sr\interview-question-sr\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })

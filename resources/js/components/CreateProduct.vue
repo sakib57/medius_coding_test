@@ -52,7 +52,29 @@
             ></vue-dropzone>
           </div>
         </div>
+        <div class="card shadow mb-4" v-if="editableImages.length > 0">
+          <div class="card-body border">
+            <div class="row">
+              <div style="position:relative;margin-bottom:15px" class="col-md-3" v-for="(image,index) in editableImages">
+                <img :src="`http://127.0.0.1:8000/uploads/`+image.file_path" width="100%" height="100px"/>
+                <button style="position:absolute;top:-10px;right:0px" class="btn btn-danger btn-sm" @click="removeImage(index,image.id,image.file_path)">X</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+
+
+
+
+
+
+
+
+
+
+
+
 
       <div class="col-md-6">
         <div class="card shadow mb-4">
@@ -191,6 +213,8 @@ import vue2Dropzone from "vue2-dropzone";
 import "vue2-dropzone/dist/vue2Dropzone.min.css";
 import InputTag from "vue-input-tag";
 
+//var tempImg = [];
+
 export default {
   components: {
     vueDropzone: vue2Dropzone,
@@ -210,6 +234,7 @@ export default {
       product_sku: "",
       description: "",
       images: [],
+      editableImages:[],
       product_variant: [
         {
           option: this.variants[0].id,
@@ -238,6 +263,9 @@ export default {
           this.product_name = response.data.product.title;
           this.product_sku = response.data.product.sku;
           this.description = response.data.product.description;
+          this.editableImages = response.data.product.product_image;
+
+          //console.log(this.editableImages);
 
           // response.data.product.product_variant.forEach(element => {
           //     var self = this;
@@ -314,16 +342,23 @@ export default {
     },
 
     afterUploadSuccess(file,response){
+      //tempImg.push(response);
       this.images.push(response);
+      
       
     },
     // store product into database
     saveProduct() {
+
+      this.$refs.myVueDropzone.processQueue();
+      //console.log(tempImg)
+
       let product = {
           title: this.product_name,
           sku: this.product_sku,
           description: this.description,
           product_image: this.images,
+          //product_image: tempImg,
           product_variant: this.product_variant,
           product_variant_prices: this.product_variant_prices
       }
@@ -343,7 +378,8 @@ export default {
         title: this.product_name,
         sku: this.product_sku,
         description: this.description,
-        //product_image: this.images,
+        product_image: this.images,
+        //product_image: tempImg,
         //product_variant: this.product_variant,
         product_variant_prices: this.product_variant_prices,
       };
@@ -358,7 +394,20 @@ export default {
           console.log(error);
         });
     },
+    removeImage(index,id,img){
+      axios.get(`/remove-product-image?id=${id}&img=${img}`)
+      .then(res=>{
+        console.log(res);
+        if(res.data.message == 'deleted'){
+          this.editableImages.splice(index, 1);
+        }
+        
+      })
+      
+    },
   },
+
+  
   mounted() {
     console.log("Component mounted.");
   },

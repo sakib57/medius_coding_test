@@ -2102,8 +2102,31 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
+ //var tempImg = [];
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
@@ -2124,6 +2147,7 @@ __webpack_require__.r(__webpack_exports__);
       product_sku: "",
       description: "",
       images: [],
+      editableImages: [],
       product_variant: [{
         option: this.variants[0].id,
         tags: []
@@ -2151,7 +2175,9 @@ __webpack_require__.r(__webpack_exports__);
         console.log(response.data);
         _this.product_name = response.data.product.title;
         _this.product_sku = response.data.product.sku;
-        _this.description = response.data.product.description; // response.data.product.product_variant.forEach(element => {
+        _this.description = response.data.product.description;
+        _this.editableImages = response.data.product.product_image; //console.log(this.editableImages);
+        // response.data.product.product_variant.forEach(element => {
         //     var self = this;
         //     self.product_variant.tags.push(element.variant);
         // });
@@ -2226,15 +2252,19 @@ __webpack_require__.r(__webpack_exports__);
       console.log(this.images);
     },
     afterUploadSuccess: function afterUploadSuccess(file, response) {
+      //tempImg.push(response);
       this.images.push(response);
     },
     // store product into database
     saveProduct: function saveProduct() {
+      this.$refs.myVueDropzone.processQueue(); //console.log(tempImg)
+
       var product = {
         title: this.product_name,
         sku: this.product_sku,
         description: this.description,
         product_image: this.images,
+        //product_image: tempImg,
         product_variant: this.product_variant,
         product_variant_prices: this.product_variant_prices
       };
@@ -2253,7 +2283,8 @@ __webpack_require__.r(__webpack_exports__);
         title: this.product_name,
         sku: this.product_sku,
         description: this.description,
-        //product_image: this.images,
+        product_image: this.images,
+        //product_image: tempImg,
         //product_variant: this.product_variant,
         product_variant_prices: this.product_variant_prices
       };
@@ -2263,6 +2294,17 @@ __webpack_require__.r(__webpack_exports__);
         }
       })["catch"](function (error) {
         console.log(error);
+      });
+    },
+    removeImage: function removeImage(index, id, img) {
+      var _this3 = this;
+
+      axios.get("/remove-product-image?id=".concat(id, "&img=").concat(img)).then(function (res) {
+        console.log(res);
+
+        if (res.data.message == 'deleted') {
+          _this3.editableImages.splice(index, 1);
+        }
       });
     }
   },
@@ -50725,7 +50767,64 @@ var render = function() {
             ],
             1
           )
-        ])
+        ]),
+        _vm._v(" "),
+        _vm.editableImages.length > 0
+          ? _c("div", { staticClass: "card shadow mb-4" }, [
+              _c("div", { staticClass: "card-body border" }, [
+                _c(
+                  "div",
+                  { staticClass: "row" },
+                  _vm._l(_vm.editableImages, function(image, index) {
+                    return _c(
+                      "div",
+                      {
+                        staticClass: "col-md-3",
+                        staticStyle: {
+                          position: "relative",
+                          "margin-bottom": "15px"
+                        }
+                      },
+                      [
+                        _c("img", {
+                          attrs: {
+                            src:
+                              "http://127.0.0.1:8000/uploads/" +
+                              image.file_path,
+                            width: "100%",
+                            height: "100px"
+                          }
+                        }),
+                        _vm._v(" "),
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-danger btn-sm",
+                            staticStyle: {
+                              position: "absolute",
+                              top: "-10px",
+                              right: "0px"
+                            },
+                            on: {
+                              click: function($event) {
+                                return _vm.removeImage(
+                                  index,
+                                  image.id,
+                                  image.file_path
+                                )
+                              }
+                            }
+                          },
+                          [_vm._v("X")]
+                        )
+                      ]
+                    )
+                  }),
+                  0
+                )
+              ])
+            ])
+          : _vm._e()
       ]),
       _vm._v(" "),
       _c("div", { staticClass: "col-md-6" }, [

@@ -32,4 +32,6 @@ Route::middleware('auth')->group(function () {
     Route::post('product-update','ProductController@productUpdate');
 
     Route::post('image-upload','ProductController@imageUpload');
+
+    Route::get('remove-product-image','ProductController@removeProductImage');
 });

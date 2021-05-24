@@ -152,7 +152,7 @@ class ProductController extends Controller
     public function productEdit($product_id)
     {
         $product = Product::where('id',$product_id)
-        //->with('productVariant')
+        ->with('productImage')
         ->with('productVariantPrice.productVariantOne'
         ,'productVariantPrice.productVariantTwo'
         ,'productVariantPrice.productVariantThree')
@@ -186,6 +186,16 @@ class ProductController extends Controller
               'description' => $request->description,
             ]
             );
+
+        // Store product images
+        foreach($request->product_image as $image){
+            $product_image = new ProductImage;
+            $product_image->product_id = $request->id;
+            $product_image->file_path = $image;
+            $product_image->save();
+        }
+
+
         foreach($request->product_variant_prices as $value){
             // echo '<pre>';
             // print_r($value['id']);
@@ -314,5 +324,21 @@ class ProductController extends Controller
                 'mesage' => 'upload failed'
             ], 503);
         }
+    }
+
+    public function removeProductImage(Request $request){
+        $img = ProductImage::find($request->id);
+        if($img){
+            $img->delete();
+            unlink(public_path()."\uploads/".$request->img);
+            return response()->json([
+                'message' => 'deleted'
+            ]);
+        }else{
+            return response()->json([
+                'message' => 'not deleted'
+            ]);
+        }
+        
     }
 }
